@@ -1,4 +1,4 @@
-package br.com.alura.forum.modelo;
+package br.com.alura.forum.enums;
 
 public enum StatusTopico {
 

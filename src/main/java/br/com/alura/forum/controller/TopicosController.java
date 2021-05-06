@@ -1,8 +1,8 @@
 package br.com.alura.forum.controller;
 
-import br.com.alura.forum.controller.dto.TopicoDto;
-import br.com.alura.forum.modelo.Curso;
-import br.com.alura.forum.modelo.Topico;
+import br.com.alura.forum.dto.TopicoDto;
+import br.com.alura.forum.entites.Curso;
+import br.com.alura.forum.entites.Topico;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 

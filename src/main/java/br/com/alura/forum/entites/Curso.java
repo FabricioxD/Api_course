@@ -1,21 +1,23 @@
-package br.com.alura.forum.modelo;
+package br.com.alura.forum.entites;
 
-
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 @Entity
-@Table(name = "usuario")
-public class Usuario {
+public class Curso {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "nome", nullable = false, updatable = false)
     private String nome;
-    @Column(name = "email", nullable = false, updatable = false)
-    private String email;
-    @Column(name = "senha", nullable = false, updatable = false)
-    private String senha;
+    private String categoria;
+
+    public Curso(String nome, String categoria) {
+        this.nome = nome;
+        this.categoria = categoria;
+    }
 
     @Override
     public int hashCode() {
@@ -33,7 +35,7 @@ public class Usuario {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        Usuario other = (Usuario) obj;
+        Curso other = (Curso) obj;
         if (id == null) {
             if (other.id != null)
                 return false;
@@ -58,19 +60,13 @@ public class Usuario {
         this.nome = nome;
     }
 
-    public String getEmail() {
-        return email;
+    public String getCategoria() {
+        return categoria;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
     }
 
-    public String getSenha() {
-        return senha;
-    }
-
-    public void setSenha(String senha) {
-        this.senha = senha;
-    }
 }
+
