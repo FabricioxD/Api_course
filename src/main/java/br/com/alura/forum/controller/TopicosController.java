@@ -9,6 +9,9 @@ import br.com.alura.forum.form.TopicoForm;
 import br.com.alura.forum.repository.CursoRepository;
 import br.com.alura.forum.repository.TopicoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,8 +24,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -44,8 +45,11 @@ public class TopicosController {
      * @return retorna um Page de TopicoDto com os tópicos já páginados
      */
     @GetMapping
-    Page<TopicoDto> lista(@RequestParam(required = false) String nomeCurso,
-                          @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable paginacao) {
+    // Cache para guardar resultado em cache e não ficar sempre chamando no banco de dados.
+    //value = identificador do cache para esse método.
+    @Cacheable(value = "listaDeTopicos")
+    public Page<TopicoDto> lista(@RequestParam(required = false) String nomeCurso,
+                          @PageableDefault(sort = "id", direction = Sort.Direction.ASC, size = 5) Pageable paginacao) {
         Page<Topico> topicos = null;
 
         // Uso de page para fazer paginacao do retorno do BD e controlar quantos itens serão retornados na requisição
@@ -62,8 +66,12 @@ public class TopicosController {
     }
 
     @PostMapping
+    //necessário para indicar que o jpa deve fazer o commit da transação no BD ao final do método.
     @Transactional
-    ResponseEntity<TopicoDto> cadastrar(@RequestBody @Valid TopicoForm form, UriComponentsBuilder uriComponentsBuilder) {
+    // necessário para indicar que deve-se limpar o cache listaDeTopicos quando houver um novo registro no BD
+    // utilizada em todos os métodos que alteram os registros armazenados em cache pela API
+    @CacheEvict(value = "listaDeTopicos", allEntries = true)
+    public ResponseEntity<TopicoDto> cadastrar(@RequestBody @Valid TopicoForm form, UriComponentsBuilder uriComponentsBuilder) {
         Topico topico = form.converter(cursoRepository);
         topicoRepository.save(topico);
         URI uri = uriComponentsBuilder.path("/topicos/{id}").buildAndExpand(topico.getId()).toUri();
@@ -88,6 +96,7 @@ public class TopicosController {
     @PutMapping("/{id}")
     // avisar o spring para commitar a transação ao final do método. todos os métodos que tiver operação de escrita deve utilizar o transactional
     @Transactional
+    @CacheEvict(value = "listaDeTopicos", allEntries = true)
     public ResponseEntity<TopicoDto> atualizar(@PathVariable Long id, @RequestBody @Valid AtualizacaoTopicoForm form) {
         Optional<Topico> optional = topicoRepository.findById(id);
         if (optional.isPresent()) {
@@ -100,6 +109,7 @@ public class TopicosController {
 
     @DeleteMapping("/{id}")
     @Transactional
+    @CacheEvict(value = "listaDeTopicos", allEntries = true)
     public ResponseEntity<?> remover(@PathVariable Long id) {
         Optional<Topico> optional = topicoRepository.findById(id);
         if (optional.isPresent()) {
