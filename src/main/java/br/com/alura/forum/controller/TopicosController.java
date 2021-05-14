@@ -8,6 +8,7 @@ import br.com.alura.forum.form.AtualizacaoTopicoForm;
 import br.com.alura.forum.form.TopicoForm;
 import br.com.alura.forum.repository.CursoRepository;
 import br.com.alura.forum.repository.TopicoRepository;
+import io.swagger.annotations.ApiImplicitParam;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.cache.annotation.CacheEvict;
@@ -110,6 +111,7 @@ public class TopicosController {
     @DeleteMapping("/{id}")
     @Transactional
     @CacheEvict(value = "listaDeTopicos", allEntries = true)
+    @ApiImplicitParam(name = "Authorization", value = "Access Token", required = true, allowEmptyValue = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
     public ResponseEntity<?> remover(@PathVariable Long id) {
         Optional<Topico> optional = topicoRepository.findById(id);
         if (optional.isPresent()) {

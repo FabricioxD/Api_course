@@ -54,6 +54,9 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
                 //permite acesso público ao endpoint /topicos/qualquerCoisa, qndo o verbo é GET.
                 .antMatchers(HttpMethod.GET, "/topicos/*").permitAll()
                 .antMatchers(HttpMethod.POST, "/auth").permitAll()
+                .antMatchers(HttpMethod.GET, "/actuator").permitAll()
+                .antMatchers(HttpMethod.GET, "/actuator/**").permitAll()
+
                 // indica que todas as URL'S que não são /topicos precisam estar autenticadas.
                 .anyRequest().authenticated()
                 // desabilita csrf, pois o token ja nos protege contra isso
@@ -67,6 +70,8 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
     //configuracoes de recursos estaticos(js, css, imagens, etc.)
     @Override
     public void configure(WebSecurity web) throws Exception {
-        super.configure(web);
+        // Libera urls de acesso ao swagger
+        web.ignoring().antMatchers("/**.html", "/v2/api-docs", "/webjars/**", "/webjars/**", "/configuration/**", "/swagger-resources/**");
+
     }
 }
